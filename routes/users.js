@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/register', (req, res) => {
     let {username, password} = req.body;
-    User.findOne(username)
+    User.findOne({username})
         .then(user =>{
             if (user !== null) {
                 return res.send({message: "Username exists"});

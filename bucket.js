@@ -9,9 +9,9 @@ const bucketlist= require('./routes/bucketlist');
 const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-app.use('/users', users);
-app.use('/auth', auth);
-app.use('/bucketlists', bucketlist);
+app.use('/api/v1/users', users);
+app.use('/api/v1/auth', auth);
+app.use('/api/v1/bucketlists', bucketlist);
 
 
 mongoose

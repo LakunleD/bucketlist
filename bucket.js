@@ -4,12 +4,14 @@ const bodyParser = require('body-parser');
 
 const users = require('./routes/users');
 const auth = require('./routes/auth');
+const bucketlist= require('./routes/bucketlist');
 
 const app = express();
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use('/users', users);
 app.use('/auth', auth);
+app.use('/bucketlist', bucketlist);
 
 
 mongoose

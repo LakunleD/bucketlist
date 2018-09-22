@@ -122,7 +122,31 @@ router.get('/:bucketlist/items', (req, res) => {
         });
 });
 
+router.get('/:bucketlist/items/:itemid', (req, res) => {
+    const {bucketlist, itemid} = req.params;
 
+    Bucketlist.findById(bucketlist)
+        .select('-__v')
+        .populate('items')
+        .then(bucketlists => {
+            if (bucketlist !== null) {
+                const items = bucketlists.items;
+                const item= items.filter((item) => item._id.toHexString() === itemid);
+                if(item.length !== 0){
+                    res.send(item[0]);
+                }
+                else {
+                    return res.status(403).send({message: 'item doesn\'t belong to this bucketlist'});
+                }
+            }
+            else {
+                return res.status(403).send({message: 'unknown bucketlist'});
+            }
+        })
+        .catch(err => {
+            return res.status(500).send(err);
+        });
 
+});
 
 module.exports = router;

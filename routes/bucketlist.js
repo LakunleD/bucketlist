@@ -97,7 +97,7 @@ router.post('/:bucketlist/items', (req, res) => {
             bucketlist.date_modified = Date.now();
             return bucketlist;
         })
-        .then(async (bucketlist) => {
+        .then((bucketlist) => {
             const updateBucketlist = new Bucketlist(bucketlist);
             updateBucketlist.save(err => {
                 if (err) return res.status(500).send(err);
@@ -193,6 +193,65 @@ router.put('/:bucketlist/items/:itemid', (req, res) => {
         .catch(err => {
             return res.status(500).send(err);
         });
+});
+
+router.delete('/:bucketlist/items/:itemid', (req, res) => {
+    const {bucketlist, itemid} = req.params;
+
+    Bucketlist.findById(bucketlist)
+        .select('-__v')
+        .populate('items')
+        .then(bucketlists => {
+            if (bucketlists !== null) {
+                const items = bucketlists.items;
+                const item = items.filter((item) => item._id.toHexString() === itemid);
+                if (item.length !== 0) {
+                    return item[0];
+                }
+                else {
+                    return res.status(403).send({message: 'item doesn\'t belong to this bucketlist'});
+                }
+            }
+            else {
+                return res.status(403).send({message: 'unknown bucketlist'});
+            }
+        })
+        .then(item => {
+            Item.findByIdAndDelete(item._id)
+                .then(deleted => deleted)
+                .catch(err => {
+                    console.log(err);
+                    return res.status(500).send(err);
+                });
+        })
+        .then(async () => {
+
+            const bucketlists = await Bucketlist.findById(bucketlist)
+                .select('-__v')
+                .then(bucketlists => bucketlists)
+                .catch(err => {
+                    return res.status(500).send(err);
+                });
+
+            return bucketlists;
+        })
+        .then(async (bucketlists) => {
+            const items = await bucketlists.items.filter((item) => item._id.toHexString() !== itemid);
+            bucketlists.items = items;
+            bucketlists.date_modified = Date.now();
+            return bucketlists
+        })
+        .then(bucketlists=>{
+            const updateBucketlist = new Bucketlist(bucketlists);
+            updateBucketlist.save(err => {
+                if (err) return res.status(500).send(err);
+                res.send(updateBucketlist);
+            })
+        })
+        .catch(err => {
+            return res.status(500).send(err);
+        });
+
 });
 
 module.exports = router;

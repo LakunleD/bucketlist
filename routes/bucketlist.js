@@ -70,5 +70,45 @@ router.delete('/:id', (req, res) => {
         });
 });
 
+router.post('/:bucketlist/items', (req, res) => {
+    const {bucketlist} = req.params;
+
+    const {name} = req.body;
+
+    Bucketlist.findById(bucketlist)
+        .then(bucketlist => {
+            if (bucketlist !== null) {
+                return bucketlist;
+            }
+            else {
+                return res.status(403).send({message: 'unknown bucketlist'});
+            }
+        })
+        .then(async (bucketlist) => {
+            const item = await Item.create({name})
+                .then(item => item)
+                .catch(err => {
+                    return res.status(500).send(err);
+                });
+
+            const item_id = item._id;
+            bucketlist.items.push(item_id);
+            bucketlist.date_modified = Date.now();
+            return bucketlist;
+        })
+        .then(async (bucketlist) => {
+            const updateBuckelist = new Bucketlist(bucketlist);
+            updateBuckelist.save(err => {
+                if (err) return res.status(500).send(err);
+                return res.send(updateBuckelist);
+            })
+        })
+        .catch(err => {
+            return res.status(500).send(err);
+        });
+});
+
+
+
 
 module.exports = router;

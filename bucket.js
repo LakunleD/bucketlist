@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use('/users', users);
 app.use('/auth', auth);
-app.use('/bucketlist', bucketlist);
+app.use('/bucketlists', bucketlist);
 
 
 mongoose

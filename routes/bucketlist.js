@@ -109,6 +109,17 @@ router.post('/:bucketlist/items', (req, res) => {
 });
 
 
+router.get('/:bucketlist/items', (req, res) => {
+    const {bucketlist} = req.params;
+
+    Bucketlist.findById(bucketlist)
+        .select('-__v')
+        .populate('items')
+        .then(bucketlists => res.send(bucketlists))
+        .catch(err => {
+            return res.status(500).send(err);
+        });
+});
 
 
 module.exports = router;

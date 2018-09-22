@@ -3,9 +3,11 @@ const express = require('express');
 const Bucketlist = require('../models/bucketlist');
 const Item = require('../models/item');
 
+const tokenManagement = require('../library/token');
+
 const router = express.Router();
 
-router.post('/', (req, res) => {
+router.post('/', tokenManagement.verifyToken, (req, res) => {
     const {name} = req.body;
 
     Bucketlist.create({name})
@@ -17,7 +19,7 @@ router.post('/', (req, res) => {
         });
 });
 
-router.get('/', (req, res) => {
+router.get('/', tokenManagement.verifyToken, (req, res) => {
     Bucketlist.find({})
         .select('-__v')
         .populate('items')
@@ -27,7 +29,7 @@ router.get('/', (req, res) => {
         });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', tokenManagement.verifyToken, (req, res) => {
     const {id} = req.params;
 
     Bucketlist.findById(id)
@@ -38,7 +40,7 @@ router.get('/:id', (req, res) => {
         });
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', tokenManagement.verifyToken, (req, res) => {
     const {id} = req.params;
     const {name, created_by} = req.body;
 
@@ -61,7 +63,7 @@ router.put('/:id', (req, res) => {
         });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', tokenManagement.verifyToken, (req, res) => {
     const {id} = req.params;
     Bucketlist.findByIdAndDelete(id)
         .then(deleted => res.send({message: 'bucketlist deleted', deleted}))
@@ -71,7 +73,7 @@ router.delete('/:id', (req, res) => {
         });
 });
 
-router.post('/:bucketlist/items', (req, res) => {
+router.post('/:bucketlist/items', tokenManagement.verifyToken, (req, res) => {
     const {bucketlist} = req.params;
 
     const {name} = req.body;
@@ -110,7 +112,7 @@ router.post('/:bucketlist/items', (req, res) => {
 });
 
 
-router.get('/:bucketlist/items', (req, res) => {
+router.get('/:bucketlist/items', tokenManagement.verifyToken, (req, res) => {
     const {bucketlist} = req.params;
 
     Bucketlist.findById(bucketlist)
@@ -122,7 +124,7 @@ router.get('/:bucketlist/items', (req, res) => {
         });
 });
 
-router.get('/:bucketlist/items/:itemid', (req, res) => {
+router.get('/:bucketlist/items/:itemid', tokenManagement.verifyToken, (req, res) => {
     const {bucketlist, itemid} = req.params;
 
     Bucketlist.findById(bucketlist)
@@ -149,7 +151,7 @@ router.get('/:bucketlist/items/:itemid', (req, res) => {
 
 });
 
-router.put('/:bucketlist/items/:itemid', (req, res) => {
+router.put('/:bucketlist/items/:itemid', tokenManagement.verifyToken, (req, res) => {
     const {bucketlist, itemid} = req.params;
 
     const {name, done} = req.body;
@@ -195,7 +197,7 @@ router.put('/:bucketlist/items/:itemid', (req, res) => {
         });
 });
 
-router.delete('/:bucketlist/items/:itemid', (req, res) => {
+router.delete('/:bucketlist/items/:itemid', tokenManagement.verifyToken, (req, res) => {
     const {bucketlist, itemid} = req.params;
 
     Bucketlist.findById(bucketlist)

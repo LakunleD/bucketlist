@@ -20,13 +20,30 @@ router.post('/', tokenManagement.verifyToken, (req, res) => {
 });
 
 router.get('/', tokenManagement.verifyToken, (req, res) => {
-    Bucketlist.find({})
-        .select('-__v')
-        .populate('items')
-        .then(bucketlists => res.send(bucketlists))
-        .catch(err => {
-            return res.status(500).send(err);
-        });
+    const {page, limit, q}= req.query;
+
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10)
+    };
+    if(q){
+        Bucketlist.find({name:q})
+            .select('-__v')
+            .populate('items')
+            .then(bucketlists => res.send(bucketlists))
+            .catch(err => {
+                return res.status(500).send(err);
+            });
+    }
+    else{
+        Bucketlist.find({})
+            .select('-__v')
+            .populate('items')
+            .then(bucketlists => res.send(bucketlists))
+            .catch(err => {
+                return res.status(500).send(err);
+            });
+    }
 });
 
 router.get('/:id', tokenManagement.verifyToken, (req, res) => {
@@ -243,7 +260,7 @@ router.delete('/:bucketlist/items/:itemid', tokenManagement.verifyToken, (req, r
             bucketlists.date_modified = Date.now();
             return bucketlists
         })
-        .then(bucketlists=>{
+        .then(bucketlists => {
             const updateBucketlist = new Bucketlist(bucketlists);
             updateBucketlist.save(err => {
                 if (err) return res.status(500).send(err);

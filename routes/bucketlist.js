@@ -1,6 +1,7 @@
 const express = require('express');
 
 const Bucketlist = require('../models/bucketlist');
+const Item = require('../models/item');
 
 const router = express.Router();
 
@@ -97,10 +98,10 @@ router.post('/:bucketlist/items', (req, res) => {
             return bucketlist;
         })
         .then(async (bucketlist) => {
-            const updateBuckelist = new Bucketlist(bucketlist);
-            updateBuckelist.save(err => {
+            const updateBucketlist = new Bucketlist(bucketlist);
+            updateBucketlist.save(err => {
                 if (err) return res.status(500).send(err);
-                return res.send(updateBuckelist);
+                return res.send(updateBucketlist);
             })
         })
         .catch(err => {
@@ -115,11 +116,13 @@ router.get('/:bucketlist/items', (req, res) => {
     Bucketlist.findById(bucketlist)
         .select('-__v')
         .populate('items')
-        .then(bucketlists => res.send(bucketlists))
+        .then(bucketlists => res.send(bucketlists.items))
         .catch(err => {
             return res.status(500).send(err);
         });
 });
+
+
 
 
 module.exports = router;

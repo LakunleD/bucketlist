@@ -10,7 +10,7 @@ router.post('/register', (req, res) => {
     User.findOne({username})
         .then(user =>{
             if (user !== null) {
-                return res.send({message: "Username exists"});
+                return res.status(403).send({message: "Username exists"});
             }
             else {
                 let data = {username};
